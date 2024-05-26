@@ -1,0 +1,17 @@
+{
+  "name": "pint-flap",
+  "version": "1.0.0",
+  "description": "A tool to interface to the @emfcamp/tillweb system and display pints consumed on a split flap display",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Tom Lynch",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv-safe": "^9.1.0",
+    "serialport": "^12.0.0",
+    "ws": "^8.17.0"
+  }
+}
