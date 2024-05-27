@@ -1,10 +1,16 @@
 require('dotenv-safe').config()
-const { WebSocketServer } = require('ws')
+
+const keypress = require('keypress')
+keypress(process.stdin)
+
+const { WebSocket, WebSocketServer } = require('ws')
 const wss = new WebSocketServer({
 	port: process.env.WS_PORT
 })
 
 console.log(`WSS started on: ws://localhost:${process.env.WS_PORT}`)
+console.log(`Press q to exit.`)
+console.log(`Press any other key to add a random number of pints to the total.`)
 
 let units = ["Can", "25ml measure", "Bottle (not wine)", "Can", "Pint (draught)", "Pint (from carton)", "Wine bottle"]
 let values = []
@@ -35,15 +41,38 @@ wss.on('connection', (ws) => {
 			console.log(`Unknown command: ${data.toString()}`)
 		}
 	})
+})
 
-	interval = setInterval(() => {
-		let output = data
+function sendUpdate(data) {
+	const json = JSON.stringify(data)
+	console.log(`Sending JSON...`)
+	console.log(data.units)
+	wss.clients.forEach(c => {
+		if (c.readyState === WebSocket.OPEN) {
+			c.send(json)
+		}
+	})
+}
 
-		units.forEach((u, i) => {
-			values[i] += Math.random() * 10
-			output.units[u] = values[i].toFixed(1)
-		})
+process.stdin.setRawMode(true)
+process.stdin.on('keypress', (ch, key) => {
+	if (ch == 'q') process.exit()
+	let output = data
 
-		ws.send(JSON.stringify(data))
-	}, 5000)
+	let multiplier = Number.parseInt(ch)
+
+	if (isNaN(multiplier)) {
+		multiplier = 5
+	}
+	if (multiplier == 0) {
+		multiplier = 100
+	}
+
+	units.forEach((u, i) => {
+		const addition = Math.random() * multiplier
+		values[i] += addition
+		output.units[u] = values[i].toFixed(1)
+	})
+
+	sendUpdate(data)
 })
