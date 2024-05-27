@@ -91,19 +91,25 @@ function inSession() {
 function sendToScreen(screen) {
 	console.log(`Screen = ${screen}`)
 
-	for (let i = 0; i < screen.length; i++) {
-		setTimeout(() => {
-			packet.writeInt8(pos + 1, 1)	// ADDR
-			packet.write(screen[pos], 3)	// VAR
-			packet.writeInt8((packet.readInt8(0) ^ packet.readInt8(1) ^ packet.readInt8(2) ^ packet.readInt8(3) ^ packet.readInt8(5)), 4)
-			serial.write(packet, (err, result) => {}, 1000)
-			pos++;
-		}, 100 * i )
+	if (serial && serial.isOpen) {
+		for (let i = 0; i < screen.length; i++) {
+			setTimeout(() => {
+				packet.writeInt8(pos + 1, 1)	// ADDR
+				packet.write(screen[pos], 3)	// VAR
+				packet.writeInt8((packet.readInt8(0) ^ packet.readInt8(1) ^ packet.readInt8(2) ^ packet.readInt8(3) ^ packet.readInt8(5)), 4)
+				serial.write(packet, (err, result) => {}, 1000)
+				pos++;
+			}, 100 * i )
+		}
+	} else {
+		console.log('No serial port connected.')
 	}
 }
 
 SerialPort.list().then((ports) => {
+	console.log('Available serial ports:')
 	console.log(ports)
+
 	ports.forEach((port) => {
 		if ((port.locationId == '01100000' ) && ! serial) {
 			console.log(`\nConnecting to: ${port.path}`)
@@ -113,7 +119,9 @@ SerialPort.list().then((ports) => {
 				baudRate: 9600
 			})
 
-			serial.on('open', ready)
+			serial.on('open', () => {
+				console.log('Connected to serial port.')
+			})
 		}
 	})
 })
