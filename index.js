@@ -11,9 +11,7 @@ console.log(`Connecting to: ${ws_url}`)
 let next_update = moment().add(10, 'seconds')
 let pints_sold = 0
 let last_screen = ""
-
 let serial
-let pos = 0
 
 const packet = Buffer.alloc( 6 )
 packet.writeInt8( 2, 0 )	// STX
@@ -51,8 +49,8 @@ setInterval(() => {
 function updateScreen() {
 	let screen = ""
 
-	if (!inSession() || pints_sold == 0) {
-		screen = "EMF*"
+	if (!inSession()) {
+		screen = "EMF?"
 	} else {
 		if (pints_sold <= 9999) {
 			screen = pints_sold.toString().padStart(4, '0')
@@ -67,7 +65,8 @@ function updateScreen() {
 	}
 
 	// Only update the screen if it's actually different from the last update
-	if (screen != last_screen) {
+	if (screen != last_screen && screen != "") {
+		console.log(screen)
 		sendToScreen(screen)
 		next_update = moment().add(process.env.UPDATE_RATE_LIMIT, 'seconds')
 		console.log(`Next update at: ${next_update}`)
@@ -88,14 +87,16 @@ function inSession() {
 	return getCurrentSession() == null ? false : true
 }
 
-function sendToScreen(screen) {
-	console.log(`Screen = ${screen}`)
+function sendToScreen(msg) {
+	console.log(`Screen = ${msg}`)
 
 	if (serial && serial.isOpen) {
-		for (let i = 0; i < screen.length; i++) {
+		let pos = 0
+		for (let i = 0; i < msg.length; i++) {
 			setTimeout(() => {
+				console.log(`${pos}: ${msg[pos]}`)
 				packet.writeInt8(pos + 1, 1)	// ADDR
-				packet.write(screen[pos], 3)	// VAR
+				packet.write(msg[pos], 3)	// VAR
 				packet.writeInt8((packet.readInt8(0) ^ packet.readInt8(1) ^ packet.readInt8(2) ^ packet.readInt8(3) ^ packet.readInt8(5)), 4)
 				serial.write(packet, (err, result) => {}, 1000)
 				pos++;
@@ -111,7 +112,7 @@ SerialPort.list().then((ports) => {
 	console.log(ports)
 
 	ports.forEach((port) => {
-		if ((port.locationId == '01100000' ) && ! serial) {
+		if ((port.manufacturer == 'FTDI' ) && ! serial) {
 			console.log(`\nConnecting to: ${port.path}`)
 
 			serial = new SerialPort({
