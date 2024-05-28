@@ -12,10 +12,10 @@ let pints_sold = 0
 let last_screen = ""
 let serial
 
-const packet = Buffer.alloc( 6 )
-packet.writeInt8( 2, 0 )	// STX
-packet.writeInt8( 4, 2 )	// CMD
-packet.writeInt8( 3, 5 )	// ETX
+const packet = Buffer.alloc(6)
+packet.writeInt8(2, 0)	// STX
+packet.writeInt8(4, 2)	// CMD
+packet.writeInt8(3, 5)	// ETX
 
 const sessions = require('./sessions.json').sessions
 
