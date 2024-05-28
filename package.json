@@ -8,7 +8,8 @@
     "dev": "npx nodemon index.js",
     "ws": "node dummy-ws.js",
     "ws-dev": "npx nodemon dummy-ws.js",
-	"update-sessions": "curl -O https://bar.emf.camp/api/sessions.json"
+	"update-sessions": "curl -O https://bar.emf.camp/api/sessions.json",
+	"install-pm2": "pm2 start ecosystem.config.js"
   },
   "keywords": [],
   "author": "Tom Lynch",
