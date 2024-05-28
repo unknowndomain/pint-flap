@@ -4,9 +4,8 @@ const {SerialPort} = require('serialport')
 const {WebSocket} = require('ws')
 const moment = require('moment')
 
-const ws_url = `ws://${process.env.WS_HOST}:${process.env.WS_PORT}`
-const ws = new WebSocket(ws_url)
-console.log(`Connecting to: ${ws_url}`)
+const ws = new WebSocket(process.env.WS_URL)
+console.log(`Connecting to: ${process.env.WS_URL}`)
 
 let next_update = moment().add(10, 'seconds')
 let pints_sold = 0
