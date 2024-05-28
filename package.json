@@ -7,7 +7,8 @@
     "start": "node index.js",
     "dev": "npx nodemon index.js",
     "ws": "node dummy-ws.js",
-    "ws-dev": "npx nodemon dummy-ws.js"
+    "ws-dev": "npx nodemon dummy-ws.js",
+	"update-sessions": "curl -O https://bar.emf.camp/api/sessions.json"
   },
   "keywords": [],
   "author": "Tom Lynch",

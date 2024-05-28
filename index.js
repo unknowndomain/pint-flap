@@ -18,7 +18,7 @@ packet.writeInt8( 2, 0 )	// STX
 packet.writeInt8( 4, 2 )	// CMD
 packet.writeInt8( 3, 5 )	// ETX
 
-const sessions = require('./sessions.json')
+const sessions = require('./sessions.json').sessions
 
 // Connect
 ws.on('open', () => {
